@@ -9,7 +9,8 @@
 点击连接，成功的话右侧会输出连接结果；
 
 4、发送初始化请求：
-{"req":"Trade_Init","rid":"D467BEF01C0772698AFCB3ED04C42BD7","para":{"Broker" : 32,"Net" : 0,"Server" : 2}}
+Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
+举例：{"req":"Trade_Init","rid":"D467BEF01C0772698AFCB3ED04C42BD7","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : ""}}
 右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
 
 5、登录交易账号请求：
