@@ -10,7 +10,7 @@
 
 4、发送初始化请求：
 Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
-举例：{"req":"Trade_Init","rid":"D467BEF01C0772698AFCB3ED04C42BD7","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : ""}}
+举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : ""}}
 右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
 
 5、登录交易账号请求：
@@ -19,7 +19,7 @@ AccountMode是资金账号还是客户号等类型，CreditAccount是否信用账号 1是，0否
 DeptID营业部ID，Encode加密方式，当前只支持0不加密，IP/Port券商交易服务器IP和端口，根据初始化返回的列表选择一个
 LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易账号ID，一般和登录账号ID一致，CommPW通讯密码，个别券商需要
 
-{"req":"Trade_Login","rid":"D467BEF01C0772698AFCB3ED04C42BD7","para":{
+{"req":"Trade_Login","rid":"2","para":{
    "AccountMode" : 8,
    "Broker" : 32,
    "CreditAccount" : 0,
