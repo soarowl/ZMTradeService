@@ -1,0 +1,47 @@
+﻿交易通Web Socket程序化交易接口测试：
+
+1、先解压缩交易通服务程序并配置安装成功，具体请参考文档“交易通服务配置说明.doc”；
+
+2、打开本地目录Test下的网页版测试页面websocket.html
+
+3、输入实际的连接地址，rid是唯一客户端连接标识，必须有，flag是标志，1指定服务器输出日志，2指示通讯数据进行GZip压缩(网页版不支持此标记测试)：
+举例：ws://192.168.1.6:888?rid=DFC76286A2F293472D6166F72CA58EAB&flag=1
+点击连接，成功的话右侧会输出连接结果；
+
+4、发送初始化请求：
+Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
+举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : ""}}
+右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
+
+5、登录交易账号请求：
+注意替换为你自己的券商信息，Broker券商标识ID，具体定义请参考文档“交易通WebSocket服务通讯协议.xls”中的券商ID定义，
+AccountMode是资金账号还是客户号等类型，CreditAccount是否信用账号 1是，0否
+DeptID营业部ID，Encode加密方式，当前只支持0不加密，IP/Port券商交易服务器IP和端口，根据初始化返回的列表选择一个
+LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易账号ID，一般和登录账号ID一致，CommPW通讯密码，个别券商需要
+
+{"req":"Trade_Login","rid":"2","para":{
+   "AccountMode" : 8,
+   "Broker" : 32,
+   "CreditAccount" : 0,
+   "DeptID" : "1",
+   "Encode" : 0,
+   "IP" : "202.108.253.141",
+   "LoginID" : "*******",
+   "LoginPW" : "******",
+   "Port" : 7708,
+   "TradeID" : "",
+   "CommPW" : ""}}
+
+6、查询交易数据
+{"req":"Trade_QueryData","rid":"3","para":{"JsonType" : 1,"QueryType" : 1}}
+
+7、板块类别查询
+{"req":"Tdx_GetPlateList","rid":"21","para":{"JsonType" : 1,"PType" : 4}}
+
+8、板块成员查询
+{"req":"Tdx_GetPlateStock","rid":"22","para":{"JsonType" : 1,"PID" : 206}}
+
+9、股票所属板块查询
+{"req":"Tdx_GetStockPlate","rid":"23","para":{"JsonType" : 0,"Code" : "002610"}}
+
+10、其他请求类似这样操作即可
