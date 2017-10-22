@@ -2,13 +2,13 @@
 
 1、先解压缩交易通服务程序并配置安装成功，具体请参考文档“交易通服务配置说明.doc”；
 
-2、打开本地目录Test下的网页版测试页面websocket.html
+2、打开本地目录Test下的网页版测试页面websocket.html或点击服务管理器的网页版测试按钮进入；
 
 3、输入实际的连接地址，rid是唯一客户端连接标识，必须有，flag是标志，1指定服务器输出日志，2指示通讯数据进行GZip压缩(网页版不支持此标记测试)：
 举例：ws://192.168.1.6:888?rid=DFC76286A2F293472D6166F72CA58EAB&flag=1
 点击连接，成功的话右侧会输出连接结果；
 
-4、发送初始化请求：
+4、发送交易服务器初始化请求：
 Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
 举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : ""}}
 右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
@@ -20,6 +20,7 @@ DeptID营业部ID，Encode加密方式，当前只支持0不加密，IP/Port券�
 LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易账号ID，一般和登录账号ID一致，CommPW通讯密码，个别券商需要
 
 {"req":"Trade_Login","rid":"2","para":{
+   "Server" : 2,
    "AccountMode" : 8,
    "Broker" : 32,
    "CreditAccount" : 0,
@@ -35,13 +36,64 @@ LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易
 6、查询交易数据
 {"req":"Trade_QueryData","rid":"3","para":{"JsonType" : 1,"QueryType" : 1}}
 
-7、板块类别查询
+7、限价委托买入
+支持批量委托，para参数指定为数组类型的json数据包，每个节点代表一个委托操作
+{"req":"Trade_CommitOrder","rid":"5","para":[
+   {
+      "Code" : "002610",
+      "Count" : 100,
+      "EType" : 1,
+      "OType" : 1,
+      "PType" : 1,
+      "Price" : "2.520000"
+   },
+   {
+      "Code" : "002610",
+      "Count" : 100,
+      "EType" : 1,
+      "OType" : 1,
+      "PType" : 1,
+      "Price" : "2.530000"
+   }
+]
+}
+委托提交后，会以事件形式推送回来委托请求的结果，类似这样：{"event":"Trade_SendOrderEvent","rid":"7","sid":"1","data":[{"委托编号":"379","批次号":"","返回信息":"","URL":"","保留信息":""}]}
+如果委托出错，类似这样的返回：
+{"event":"Trade_SendOrderEvent","rid":"7","sid":"2","data":{"ErrInfo":"[60200][可用资金不足][fund_account=**********,money_type=0,p_occur_balance=258.10,p_enable_balance=97.82]"}}
+
+8、板块类别查询
 {"req":"Tdx_GetPlateList","rid":"21","para":{"JsonType" : 1,"PType" : 4}}
 
-8、板块成员查询
-{"req":"Tdx_GetPlateStock","rid":"22","para":{"JsonType" : 1,"PID" : 206}}
+9、板块成员查询
+{"req":"Tdx_GetPlateMember","rid":"22","para":{"JsonType" : 1,"PID" : 206}}
 
-9、股票所属板块查询
+10、股票所属板块查询
 {"req":"Tdx_GetStockPlate","rid":"23","para":{"JsonType" : 0,"Code" : "002610"}}
 
-10、其他请求类似这样操作即可
+11、根据ID取股票或板块信息
+/// 取股票
+{"req":"Tdx_GetInfoByID","rid":"10","para":{"SType" : 2,"JsonType" : 0,"ID" : "5"}}
+/// 取板块
+{"req":"Tdx_GetInfoByID","rid":"11","para":{"SType" : 1,"JsonType" : 0,"ID" : "7"}}
+
+12、根据名称模糊查询股票或板块
+/// 查询股票，可能多条记录，分别属于不同板块
+{"req":"Tdx_SearchByName","rid":"24","para":{"SType" : 2,"JsonType" : 0,"Name" : "京东方"}}
+/// 查询板块
+{"req":"Tdx_SearchByName","rid":"25","para":{"SType" : 1,"JsonType" : 0,"Name" : "沪深"}}
+
+13、根据代码模糊查询股票或板块
+/// 查询股票，可能多条记录，分别属于不同板块
+{"req":"Tdx_SearchByCode","rid":"26","para":{"SType" : 2,"JsonType" : 0,"Code" : "00007"}}
+/// 查询板块
+{"req":"Tdx_SearchByCode","rid":"27","para":{"SType" : 1,"JsonType" : 0,"Code" : "399"}}
+
+14、退出交易登录
+退出交易登录时需要指定交易登录返回的ID和交易服务器类型
+{"req":"Trade_LogOut","rid":"30","para":{
+"ID" : 2,
+"Server" : 2
+}
+}
+
+15、其他功能请求的范例，请参考接口文档类似操作即可。如有不明确的使用，可咨询客服。也可以启动我们提供的范例程序ZMTradeClientDemo.exe，默认勾选输出日志执行每个功能，然后在服务程序的data目录中，找到ZMTradeService.txt日志文件中找到传送的参数和请求的功能节点，参照执行即可。
