@@ -4,13 +4,13 @@
 
 2、打开本地目录Test下的网页版测试页面websocket.html或点击服务管理器的网页版测试按钮进入；
 
-3、输入实际的连接地址，rid是唯一客户端连接标识，必须有，flag是标志，1指定服务器输出日志，2指示通讯数据进行GZip压缩(网页版不支持此标记测试)：
+3、输入实际的连接地址，rid是唯一客户端连接标识，必须有，flag是标志，1指定服务器输出日志，2指示通讯数据进行GZip压缩(网页版不支持此标记测试)，3就表示输出日志同时进行Gzip压缩。
 举例：ws://192.168.1.6:888?rid=DFC76286A2F293472D6166F72CA58EAB&flag=1
 点击连接，成功的话右侧会输出连接结果；
 
 4、发送行情服务器初始化请求：
 Broker为券商ID(L2行情不需要)，Net指定网络类型。Server定义如下：1为普通行情服务器，2为交易服务器，4是扩展行情服务器，8为Level2行情服务器
-举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 1}}
+举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 1,"TryConn" : 3}}
 右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
 
 5、登录普通行情请求：
@@ -41,7 +41,44 @@ Start指定从0开始，获取更多时，先指定0,获取800后，起始就设
    "Start" : 0
 }}
 
-8、退出行情登录
+8、取分时行情数据，发送如下请求：
+{"req":"Market_TimeData","rid":"9","para":{"Code" : "000001",
+   "JsonType" : 1,
+   "Server" : 1
+}}
+
+9、取分时成交数据，发送如下请求：
+{"req":"Market_TimeTrade","rid":"10","para":{ "Code" : "000001",
+   "Count" : 800,
+   "JsonType" : 1,
+   "Server" : 1,
+   "Start" : 0
+}}
+
+10、取除权数据，发送如下请求：
+{"req":"Market_XdxrInfo","rid":"11","para":{ "Code" : "000001",
+   "JsonType" : 1,
+   "Server" : 1
+}}
+
+11、取指定市场代码数量，发送如下请求：
+EType 2代表上海市场 1代表深圳市场
+{"req":"Market_ListCount","rid":"12","para":{ "EType" : 1,
+   "Server" : 1
+}}
+
+12、取市场代码列表，发送如下请求：
+{"req":"Market_CodeList","rid":"13","para":{ "EType" : 2,"JsonType" : 1,"Server" : 1,"Start" : 0
+
+}}
+
+13、取财务数据，发送如下请求：
+{"req":"Market_FinaInfo","rid":"14","para":{ "Code" : "000001",
+   "JsonType" : 1,
+   "Server" : 1
+}}
+
+14、退出行情登录
 退出交易登录时需要指定行情登录返回的ID和行情服务器类型
 {"req":"Trade_LogOut","rid":"30","para":{
 "ID" : 2,
@@ -49,4 +86,4 @@ Start指定从0开始，获取更多时，先指定0,获取800后，起始就设
 }
 }
 
-15、其他功能请求的范例，请参考接口文档类似操作即可。如有不明确的使用，可咨询客服。也可以启动我们提供的范例程序ZMTradeClientDemo.exe，默认勾选输出日志执行每个功能，然后在服务程序的data目录中，找到ZMTradeService.txt日志文件中找到传送的参数和请求的功能节点，参照执行即可。
+其他功能请求的范例，请参考接口文档类似操作即可。如有不明确的使用，可咨询客服。也可以启动我们提供的范例程序ZMTradeClientDemo.exe，默认勾选输出日志执行每个功能，然后在服务程序的data目录中，找到ZMTradeService.txt日志文件中找到传送的参数和请求的功能节点，参照执行即可。

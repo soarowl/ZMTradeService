@@ -4,18 +4,18 @@
 
 2、打开本地目录Test下的网页版测试页面websocket.html或点击服务管理器的网页版测试按钮进入；
 
-3、输入实际的连接地址，rid是唯一客户端连接标识，必须有，flag是标志，1指定服务器输出日志，2指示通讯数据进行GZip压缩(网页版不支持此标记测试)：
+3、输入实际的连接地址，rid是唯一客户端连接标识，必须有，flag是标志掩码，1指定服务器输出日志，2指示通讯数据进行GZip压缩(网页版不支持此标记测试)，3就表示输出日志同时进行Gzip压缩。
 举例：ws://192.168.1.6:888?rid=DFC76286A2F293472D6166F72CA58EAB&flag=1
 点击连接，成功的话右侧会输出连接结果；
 
 4、发送交易服务器初始化请求：
 Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
-举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : ""}}
+举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : "","TryConn" : 3}}
 右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
 
 5、登录交易账号请求：
 注意替换为你自己的券商信息，Broker券商标识ID，具体定义请参考文档“交易通WebSocket服务通讯协议.xls”中的券商ID定义，
-AccountMode是资金账号还是客户号等类型，CreditAccount是否信用账号 1是，0否
+AccountMode是资金账号还是客户号等类型，CreditAccount是否信用账号 1是，0否 ReportSuccess委托实际成交轮询定时器，毫秒单位
 DeptID营业部ID，Encode加密方式，当前只支持0不加密，IP/Port券商交易服务器IP和端口，根据初始化返回的列表选择一个
 LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易账号ID，一般和登录账号ID一致，CommPW通讯密码，个别券商需要
 
@@ -26,6 +26,7 @@ LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易
    "CreditAccount" : 0,
    "DeptID" : "1",
    "Encode" : 0,
+   "ReportSuccess" : 1000,
    "IP" : "202.108.253.141",
    "LoginID" : "*******",
    "LoginPW" : "******",
@@ -88,12 +89,17 @@ LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易
 /// 查询板块
 {"req":"Tdx_SearchByCode","rid":"27","para":{"SType" : 1,"JsonType" : 0,"Code" : "399"}}
 
-14、退出交易登录
+14、查询5档行情数据
+{"req":"Trade_QueryQuote","rid":"3","para":{"Codes" : "000001",
+   "JsonType" : 1,
+   "Server" : 2}}
+
+15、退出交易登录
 退出交易登录时需要指定交易登录返回的ID和交易服务器类型
 {"req":"Trade_LogOut","rid":"30","para":{
-"ID" : 2,
+"ID" : 1,
 "Server" : 2
 }
 }
 
-15、其他功能请求的范例，请参考接口文档类似操作即可。如有不明确的使用，可咨询客服。也可以启动我们提供的范例程序ZMTradeClientDemo.exe，默认勾选输出日志执行每个功能，然后在服务程序的data目录中，找到ZMTradeService.txt日志文件中找到传送的参数和请求的功能节点，参照执行即可。
+其他功能请求的范例，请参考接口文档类似操作即可。如有不明确的使用，可咨询客服。也可以启动我们提供的范例程序ZMTradeClientDemo.exe，默认勾选输出日志执行每个功能，然后在服务程序的data目录中，找到ZMTradeService.txt日志文件中找到传送的参数和请求的功能节点，参照执行即可。
