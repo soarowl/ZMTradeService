@@ -8,18 +8,24 @@
 举例：ws://192.168.1.6:888?rid=DFC76286A2F293472D6166F72CA58EAB&flag=1
 点击连接，成功的话右侧会输出连接结果；
 
-4、发送交易服务器初始化请求：
-Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
-举例：{"req":"Trade_Init","rid":"1","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : "","TryConn" : 3}}
+4、登录交易通系统请求：
+LoginID为交易通服务管理器分配的登录账号ID，LoginPW为登录密码，Encode为加密方式，0为明文密码，1为SH1加密后的密码串
+举例：{"req":"Server_Login","rid":"1","para":{"LoginID" : "","LoginPW" : "","Encode" : 0}}
 右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
 
-5、登录交易账号请求：
+5、发送交易服务器初始化请求：
+Broker为券商ID，Net指定网络类型，ClientVer指定登录交易服务器所用的版本号，为空时使用默认值
+举例：{"req":"Trade_Init","rid":"2","para":{"Broker" : 32,"Net" : 0,"Server" : 2,"ClientVer" : "","TryConn" : 3}}
+右侧会返回请求返回，如果有事件通知返回，也在右侧显示出来；
+
+6、普通方式登录交易账号请求：
 注意替换为你自己的券商信息，Broker券商标识ID，具体定义请参考文档“交易通WebSocket服务通讯协议.xls”中的券商ID定义，
 AccountMode是资金账号还是客户号等类型，CreditAccount是否信用账号 1是，0否 ReportSuccess委托实际成交轮询定时器，毫秒单位
 DeptID营业部ID，Encode加密方式，当前只支持0不加密，IP/Port券商交易服务器IP和端口，根据初始化返回的列表选择一个
 LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易账号ID，一般和登录账号ID一致，CommPW通讯密码，个别券商需要
+TryConn为登录交易服务器成功后出现连接故障时自动重新连接次数
 
-{"req":"Trade_Login","rid":"2","para":{
+{"req":"Trade_Login","rid":"3","para":{
    "Server" : 2,
    "AccountMode" : 8,
    "Broker" : 32,
@@ -27,6 +33,7 @@ LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易
    "DeptID" : "1",
    "Encode" : 0,
    "ReportSuccess" : 1000,
+   "TryConn" : 3,
    "IP" : "202.108.253.141",
    "LoginID" : "*******",
    "LoginPW" : "******",
@@ -34,12 +41,25 @@ LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易
    "TradeID" : "",
    "CommPW" : ""}}
 
-6、查询交易数据
-{"req":"Trade_QueryData","rid":"3","para":{"JsonType" : 1,"QueryType" : 1}}
+7、安全方式登录交易账号请求：
+ReportSuccess委托实际成交轮询定时器，毫秒单位
+TryConn为登录交易服务器成功后出现连接故障时自动重新连接次数
+IP/Port券商交易服务器IP和端口
+传以上参数时用此指定的，不传时用后台配置的
+ID为必须传的参数，ID由登录交易通系统后获得
+{"req":"Trade_SafeLogin","rid":"4","para":{
+   "ID" : 1,
+   "ReportSuccess" : 1000,
+   "TryConn" : 3,
+   "IP" : "202.108.253.141",
+   "Port" : 7708}}
 
-7、限价委托买入
+8、查询交易数据
+{"req":"Trade_QueryData","rid":"5","para":{"JsonType" : 1,"QueryType" : 1}}
+
+9、限价委托买入
 支持批量委托，para参数指定为数组类型的json数据包，每个节点代表一个委托操作
-{"req":"Trade_CommitOrder","rid":"5","para":[
+{"req":"Trade_CommitOrder","rid":"7","para":[
    {
       "Code" : "002610",
       "Count" : 100,
@@ -62,39 +82,39 @@ LoginID登录账号ID，LoginPW登录密码目前只支持明文，TradeID交易
 如果委托出错，类似这样的返回：
 {"event":"Trade_SendOrderEvent","rid":"7","sid":"2","data":{"ErrInfo":"[60200][可用资金不足][fund_account=**********,money_type=0,p_occur_balance=258.10,p_enable_balance=97.82]"}}
 
-8、板块类别查询
+10、板块类别查询
 {"req":"Tdx_GetPlateList","rid":"21","para":{"JsonType" : 1,"PType" : 4}}
 
-9、板块成员查询
+11、板块成员查询
 {"req":"Tdx_GetPlateMember","rid":"22","para":{"JsonType" : 1,"PID" : 206}}
 
-10、股票所属板块查询
+12、股票所属板块查询
 {"req":"Tdx_GetStockPlate","rid":"23","para":{"JsonType" : 0,"Code" : "002610"}}
 
-11、根据ID取股票或板块信息
+13、根据ID取股票或板块信息
 /// 取股票
-{"req":"Tdx_GetInfoByID","rid":"10","para":{"SType" : 2,"JsonType" : 0,"ID" : "5"}}
+{"req":"Tdx_GetInfoByID","rid":"24","para":{"SType" : 2,"JsonType" : 0,"ID" : "5"}}
 /// 取板块
-{"req":"Tdx_GetInfoByID","rid":"11","para":{"SType" : 1,"JsonType" : 0,"ID" : "7"}}
+{"req":"Tdx_GetInfoByID","rid":"25","para":{"SType" : 1,"JsonType" : 0,"ID" : "7"}}
 
-12、根据名称模糊查询股票或板块
+14、根据名称模糊查询股票或板块
 /// 查询股票，可能多条记录，分别属于不同板块
-{"req":"Tdx_SearchByName","rid":"24","para":{"SType" : 2,"JsonType" : 0,"Name" : "京东方"}}
+{"req":"Tdx_SearchByName","rid":"26","para":{"SType" : 2,"JsonType" : 0,"Name" : "京东方"}}
 /// 查询板块
-{"req":"Tdx_SearchByName","rid":"25","para":{"SType" : 1,"JsonType" : 0,"Name" : "沪深"}}
+{"req":"Tdx_SearchByName","rid":"27","para":{"SType" : 1,"JsonType" : 0,"Name" : "沪深"}}
 
-13、根据代码模糊查询股票或板块
+15、根据代码模糊查询股票或板块
 /// 查询股票，可能多条记录，分别属于不同板块
-{"req":"Tdx_SearchByCode","rid":"26","para":{"SType" : 2,"JsonType" : 0,"Code" : "00007"}}
+{"req":"Tdx_SearchByCode","rid":"28","para":{"SType" : 2,"JsonType" : 0,"Code" : "00007"}}
 /// 查询板块
-{"req":"Tdx_SearchByCode","rid":"27","para":{"SType" : 1,"JsonType" : 0,"Code" : "399"}}
+{"req":"Tdx_SearchByCode","rid":"29","para":{"SType" : 1,"JsonType" : 0,"Code" : "399"}}
 
-14、查询5档行情数据
-{"req":"Trade_QueryQuote","rid":"3","para":{"Codes" : "000001",
+16、查询5档行情数据
+{"req":"Trade_QueryQuote","rid":"10","para":{"Codes" : "000001",
    "JsonType" : 1,
    "Server" : 2}}
 
-15、退出交易登录
+17、退出交易登录
 退出交易登录时需要指定交易登录返回的ID和交易服务器类型
 {"req":"Trade_LogOut","rid":"30","para":{
 "ID" : 1,
