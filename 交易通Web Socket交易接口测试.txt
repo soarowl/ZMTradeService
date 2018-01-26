@@ -110,13 +110,16 @@ ID为必须传的参数，ID由登录交易通系统后获得
 {"req":"Tdx_SearchByCode","rid":"29","para":{"SType" : 1,"JsonType" : 0,"Code" : "399"}}
 
 16、查询5档行情数据
-{"req":"Trade_QueryQuote","rid":"10","para":{"Codes" : "000001",
+{"req":"Trade_QueryQuote","rid":"30","para":{"Codes" : "000001",
    "JsonType" : 1,
    "Server" : 2}}
 
-17、退出交易登录
+17、添加行情推送，支持多只股票，Timer为定时刷新毫秒
+{"req":"Market_AddTimerQuote","rid":"31","para":{"Codes" : "000001,600000", "Timer" : 1000, "Server" : 2}}
+
+18、退出交易登录
 退出交易登录时需要指定交易登录返回的ID和交易服务器类型
-{"req":"Trade_LogOut","rid":"30","para":{
+{"req":"Trade_LogOut","rid":"35","para":{
 "ID" : 1,
 "Server" : 2
 }
