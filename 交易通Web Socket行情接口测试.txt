@@ -78,7 +78,16 @@ EType 2代表上海市场 1代表深圳市场
    "Server" : 1
 }}
 
-14、退出行情登录
+14、添加买卖行情推送，支持多只股票，Five为1标识5档行情，Timer为定时刷新毫秒
+{"req":"Market_AddTimerQuote","rid":"15","para":{"Codes" : "000001,600000","Five" : 1, "Timer" : 1000, "Server" : 1}}
+
+15、添加分时数据推送，支持多只股票、KeepCount为保留推送股票数量，添加超过数量先进队列的自动剔除，Timer为定时刷新毫秒
+{"req":"Market_AddTimerData","rid":"16","para":{"Codes" : "000001,600000","KeepCount" : 10, "Timer" : 1000, "Server" : 1}}
+
+16、添加分时成交推送，支持多只股票、KeepCount为保留推送股票数量，添加超过数量先进队列的自动剔除、GetCount为获取最近多少笔记录，Timer为定时刷新毫秒
+{"req":"Market_AddTimerTrade","rid":"17","para":{"Codes" : "000001,600000","KeepCount" : 10, "GetCount" : 120,"Timer" : 1000, "Server" : 1}}
+
+17、退出行情登录
 退出交易登录时需要指定行情登录返回的ID和行情服务器类型
 {"req":"Trade_LogOut","rid":"30","para":{
 "ID" : 2,
